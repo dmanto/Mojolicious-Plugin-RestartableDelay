@@ -1,10 +1,10 @@
-# mojo-delay-add-steps
-A Mojolicious Helper to dinamically add new steps to Mojo::IOLoop::Delay asynchronous steps
+# Mojolicious-Plugin-RestartableDelay
+A Mojolicious Helper to dinamically restart steps adding them to the Mojo::IOLoop singleton
 
 Helper looks like this:
 
 ```perl
-helper add_steps => sub {
+helper restartable_delay => sub {
   my $c=shift;
   my $cb = pop;
   my @steps = @_;
@@ -12,7 +12,7 @@ helper add_steps => sub {
     @steps,
     sub {
       my ($d, $more) = @_;
-      if ($more) {$c->add_steps(@steps,$cb)} else {$cb->(@_)}
+      if ($more) {$c->restartable_delay(@steps,$cb)} else {$cb->(@_)}
     }
   );
 };
@@ -26,7 +26,7 @@ The synapsis will be something like
 
 ```perl
 my $rmn = 100;
-  $c->add_steps(
+  $c->restartable_delay(
     sub {
           $c->pg->db->query(
             'select * from app_test where id=?', $rmn => shift->begin);
